@@ -1,0 +1,97 @@
+# VitePress 动态侧边栏配置文件
+
+# ============================================================
+# 项目配置
+# ============================================================
+# 定义要监控的文档项目列表
+# 每个项目可以独立启用/禁用，控制是否折叠
+projects:
+  # 工作文档项目
+  - name: 工作文档
+    sourceDir: C:\Work\MD
+    enabled: true
+    collapsed: false
+    description: 日常工作文档
+
+  # 学习笔记项目（已禁用）
+  - name: 学习笔记
+    sourceDir: C:\Study\notes
+    enabled: false
+    collapsed: true
+    description: 学习笔记和教程
+
+  # 项目文档（已禁用）
+  - name: 项目文档
+    sourceDir: C:\Projects\docs
+    enabled: false
+    collapsed: true
+    description: 各项目的技术文档
+
+# ============================================================
+# 固定外部链接
+# ============================================================
+# 在侧边栏底部显示的外部资源链接
+
+fixedLinks:
+  # 常用文档
+  - text: 📌 常用文档
+    collapsed: false
+    items:
+      - text: VitePress 官方文档
+        link: https://vitepress.dev/
+      - text: Markdown 语法指南
+        link: https://www.markdownguide.org/basic-syntax/
+
+  # 开发工具
+  - text: 🔧 开发工具
+    collapsed: true
+    items:
+      - text: Git 文档
+        link: https://git-scm.com/doc
+
+  # 线上项目地址
+  - text: 🔧 线上项目地址
+    collapsed: true
+    items:
+      - text: 水手平台
+        link: https://ai.luffycity.com/
+      - text: 路飞官网
+        link: https://www.luffycity.com/
+
+# ============================================================
+# 本地固定文档
+# ============================================================
+# 在侧边栏顶部显示的本地通用文档
+# 这些文档位于项目根目录
+
+localFixedDocs:
+  - text: 📚 本地通用文档
+    collapsed: false
+    items:
+      - text: 使用指南
+        link: /local/guide/使用指南
+      - text: MCP收纳文档
+        link: /local/mcp/MCP收纳文档
+# ============================================================
+# 系统设置
+# ============================================================
+
+settings:
+  # 防抖延迟（毫秒）
+  # 文件变化后等待多久再重新生成，避免频繁触发
+  debounceDelay: 1000
+
+  # 排除的文件和目录
+  # 这些文件/目录不会被扫描和同步
+  excludes:
+    - node_modules
+    - .git
+    - .vitepress
+    - README.md
+    - .DS_Store
+
+  # 输出文件路径（相对于项目根目录）
+  outputFile: .vitepress/config/sidebar.ts
+
+  # 文档同步目录
+  docsDir: docs

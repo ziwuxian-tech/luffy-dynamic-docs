@@ -1,0 +1,27 @@
+{
+  "name": "dynamic-documents",
+  "version": "1.0.0",
+  "description": "动态文档中心 - 自动生成侧边栏",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
+    "generate": "node scripts/generate-sidebar.js",
+    "generate:dev": "cross-env DOCS_ENV=dev node scripts/generate-sidebar.js",
+    "generate:prod": "cross-env DOCS_ENV=prod node scripts/generate-sidebar.js",
+    "watch": "node scripts/watch-docs.js",
+    "watch:dev": "cross-env DOCS_ENV=dev node scripts/watch-docs.js",
+    "dev": "concurrently \"pnpm run watch\" \"pnpm run docs:dev\" --kill-others",
+    "build": "pnpm run generate:prod && pnpm run docs:build"
+  },
+  "devDependencies": {
+    "chokidar": "^3.5.3",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "js-yaml": "^4.1.0",
+    "vitepress": "2.0.0-alpha.15"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}

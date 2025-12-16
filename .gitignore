@@ -1,0 +1,37 @@
+# 依赖
+node_modules/
+pnpm-lock.yaml
+
+# VitePress 构建输出
+.vitepress/dist
+.vitepress/cache
+
+# 同步的文档目录(从 C:\Work\md 自动同步)
+docs/
+!docs/README.md
+
+# 自动生成的侧边栏配置
+.vitepress/config/sidebar.ts
+
+# 日志
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+
+# 环境变量
+.env

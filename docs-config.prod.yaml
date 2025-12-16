@@ -1,0 +1,37 @@
+# 生产环境配置文件 (DOCS_ENV=prod)
+# 适用于构建部署阶段
+
+projects:
+  # 生产环境通常指向服务器上的稳定文档目录
+  - name: 工作文档
+    sourceDir: /var/www/docs/work
+    enabled: true
+    collapsed: false
+
+  - name: 项目文档
+    sourceDir: /var/www/docs/projects
+    enabled: true
+    collapsed: true
+
+# 生产环境通常不包含本地调试用的文档
+localFixedDocs: []
+
+fixedLinks:
+  - text: 📌 官方资源
+    items:
+      - text: 公司官网
+        link: https://www.example.com
+      - text: 内部 Wiki
+        link: https://wiki.example.com
+
+settings:
+  # 生产环境不需要防抖，因为是一次性生成
+  debounceDelay: 0
+  excludes:
+    - node_modules
+    - .git
+    - .vitepress
+    - README.md
+    - .DS_Store
+  outputFile: .vitepress/config/sidebar.ts
+  docsDir: docs
