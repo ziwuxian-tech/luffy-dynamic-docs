@@ -8,17 +8,17 @@
 projects:
   # 工作文档项目
   - name: 工作文档
-    sourceDir: C:\Work\MD
+    sourceDir: ~/IdeaProjects/plg-backend
     enabled: true
     collapsed: false
-    description: 日常工作文档
+    description: 项目文档
 
   # 学习笔记项目（已禁用）
-  - name: 学习笔记
-    sourceDir: C:\Study\notes
-    enabled: false
-    collapsed: true
-    description: 学习笔记和教程
+  - name: Claude Code生成计划
+    sourceDir: ~/.claude/plans
+    enabled: true
+    collapsed: false
+    description: Claude Code生成计划
 
   # 项目文档（已禁用）
   - name: 项目文档
@@ -70,8 +70,7 @@ localFixedDocs:
     items:
       - text: 使用指南
         link: /local/guide/使用指南
-      - text: MCP收纳文档
-        link: /local/mcp/MCP收纳文档
+
 # ============================================================
 # 系统设置
 # ============================================================
@@ -81,14 +80,12 @@ settings:
   # 文件变化后等待多久再重新生成，避免频繁触发
   debounceDelay: 1000
 
-  # 排除的文件和目录
+  # 排除的文件和目录（支持 glob 模式）
   # 这些文件/目录不会被扫描和同步
   excludes:
-    - node_modules
-    - .git
-    - .vitepress
-    - README.md
-    - .DS_Store
+    - ".*"                                    # 隐藏文件/目录
+    - "{node_modules,build,target,logs}"      # 构建产物
+    - docker                                  # 部署配置
 
   # 输出文件路径（相对于项目根目录）
   outputFile: .vitepress/config/sidebar.ts

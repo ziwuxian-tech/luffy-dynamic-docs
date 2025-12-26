@@ -6,9 +6,9 @@
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview",
-    "generate": "node scripts/generate-sidebar.js",
-    "generate:dev": "cross-env DOCS_ENV=dev node scripts/generate-sidebar.js",
-    "generate:prod": "cross-env DOCS_ENV=prod node scripts/generate-sidebar.js",
+    "generate": "node scripts/generate-site-config.js",
+    "generate:dev": "cross-env DOCS_ENV=dev node scripts/generate-site-config.js",
+    "generate:prod": "cross-env DOCS_ENV=prod node scripts/generate-site-config.js",
     "watch": "node scripts/watch-docs.js",
     "watch:dev": "cross-env DOCS_ENV=dev node scripts/watch-docs.js",
     "dev": "concurrently \"pnpm run watch\" \"pnpm run docs:dev\" --kill-others",
@@ -22,6 +22,7 @@
     "vitepress": "2.0.0-alpha.15"
   },
   "dependencies": {
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "minimatch": "^10.1.1"
   }
 }

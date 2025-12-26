@@ -6,7 +6,7 @@ const baseNav = [
 ]
 
 const resolvedNav = autoNav.length > 0 ? [...baseNav, ...autoNav] : baseNav
-const resolvedSidebar = autoSidebar.length > 0 ? autoSidebar : []
+const resolvedSidebar = Object.keys(autoSidebar).length > 0 ? autoSidebar : []
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
