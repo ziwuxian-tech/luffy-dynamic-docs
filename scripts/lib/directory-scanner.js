@@ -13,9 +13,11 @@ const { extractTitle, getFileName, isExcluded } = require('./file-utils');
  * @param {string} baseDir - 基础目录(用于计算相对路径)
  * @param {string} projectName - 项目名称(用于生成链接)
  * @param {Array} excludes - 排除列表
+ * @param {number} maxDepth - 最大递归深度(默认1层，超过则扁平化)
+ * @param {number} currentDepth - 当前深度(内部使用)
  * @returns {Array} - 侧边栏配置数组
  */
-function scanDirectory(dir, baseDir, projectName, excludes) {
+function scanDirectory(dir, baseDir, projectName, excludes, maxDepth = 1, currentDepth = 0) {
     const items = [];
 
     try {
@@ -33,13 +35,21 @@ function scanDirectory(dir, baseDir, projectName, excludes) {
             const fullPath = path.join(dir, entry.name);
 
             if (entry.isDirectory()) {
-                const subItems = scanDirectory(fullPath, baseDir, projectName, excludes);
-                if (subItems.length > 0) {
-                    items.push({
-                        text: entry.name,
-                        collapsed: false,
-                        items: subItems
-                    });
+                // 检查是否达到最大深度
+                if (currentDepth >= maxDepth) {
+                    // 达到最大深度，扁平化处理：收集所有子文档
+                    const flatItems = collectAllMarkdownFiles(fullPath, baseDir, projectName, excludes);
+                    items.push(...flatItems);
+                } else {
+                    // 未达到最大深度，继续递归
+                    const subItems = scanDirectory(fullPath, baseDir, projectName, excludes, maxDepth, currentDepth + 1);
+                    if (subItems.length > 0) {
+                        items.push({
+                            text: entry.name,
+                            collapsed: false,
+                            items: subItems
+                        });
+                    }
                 }
             } else if (entry.name.endsWith('.md')) {
                 const title = extractTitle(fullPath) || getFileName(fullPath);
@@ -51,6 +61,46 @@ function scanDirectory(dir, baseDir, projectName, excludes) {
         }
     } catch (error) {
         console.error(`扫描目录失败: ${dir}`, error);
+    }
+
+    return items;
+}
+
+/**
+ * 收集目录下所有 Markdown 文件(扁平化)
+ * @param {string} dir - 要扫描的目录
+ * @param {string} baseDir - 基础目录
+ * @param {string} projectName - 项目名称
+ * @param {Array} excludes - 排除列表
+ * @returns {Array} - 文档配置数组
+ */
+function collectAllMarkdownFiles(dir, baseDir, projectName, excludes) {
+    const items = [];
+
+    try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+        for (const entry of entries) {
+            if (isExcluded(entry.name, excludes)) {
+                continue;
+            }
+
+            const fullPath = path.join(dir, entry.name);
+
+            if (entry.isDirectory()) {
+                // 递归收集子目录中的文件
+                const subItems = collectAllMarkdownFiles(fullPath, baseDir, projectName, excludes);
+                items.push(...subItems);
+            } else if (entry.name.endsWith('.md')) {
+                const title = extractTitle(fullPath) || getFileName(fullPath);
+                const relativePath = path.relative(baseDir, fullPath);
+                const link = `/docs/${projectName}/${relativePath.replace(/\\/g, '/').replace(/\.md$/, '')}`;
+
+                items.push({ text: title, link });
+            }
+        }
+    } catch (error) {
+        console.error(`收集文件失败: ${dir}`, error);
     }
 
     return items;

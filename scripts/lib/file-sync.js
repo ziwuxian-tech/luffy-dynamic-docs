@@ -1,7 +1,7 @@
 /**
  * 文件同步模块
  * 负责将源目录的文档同步到 VitePress docs 目录
- * 删除的文件会生成占位页面，而不是直接 404
+ * 删除的文件会被真正删除，由 VitePress 404 页面处理
  */
 
 const fs = require('fs');
@@ -44,64 +44,6 @@ function collectMdFiles(dir, baseDir, excludeList = []) {
 }
 
 /**
- * 生成已删除文档的占位页面
- * @param {string} filePath - 目标文件路径
- * @param {string} originalTitle - 原文档标题（从现有文件提取）
- */
-function generateDeletedPlaceholder(filePath, originalTitle) {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-
-    const fileName = path.basename(filePath, '.md');
-    const title = originalTitle || fileName;
-
-    const content = `# ${title}
-
-> 该文档已被删除或移动
-
----
-
-此页面对应的源文档已不存在。可能的原因：
-
-- 文档已被删除
-- 文档已移动到其他位置
-- 文档已重命名
-
-**建议操作：**
-
-- 使用左侧导航栏查找相关文档
-- 使用搜索功能查找内容
-- [返回首页](/)
-
----
-
-*此页面由系统自动生成*
-`;
-
-    fs.writeFileSync(filePath, content, 'utf-8');
-}
-
-/**
- * 从 md 文件提取标题
- * @param {string} filePath - 文件路径
- * @returns {string|null} - 标题或 null
- */
-function extractTitleFromFile(filePath) {
-    try {
-        if (!fs.existsSync(filePath)) {
-            return null;
-        }
-        const content = fs.readFileSync(filePath, 'utf-8');
-        const match = content.match(/^#\s+(.+)$/m);
-        return match ? match[1].trim() : null;
-    } catch {
-        return null;
-    }
-}
-
-/**
  * 同步项目文档到 VitePress docs 目录
  * @param {Object} project - 项目配置
  * @param {string} docsBaseDir - docs 基础目录
@@ -118,20 +60,44 @@ function syncProjectDocuments(project, docsBaseDir, excludeList, rootDir) {
     // 找出已删除的文件（在目标目录但不在源目录）
     const deletedFiles = [...targetFiles].filter(f => !sourceFiles.has(f));
 
-    // 为已删除的文件生成占位页面
+    // 删除已不存在的文件
     for (const relativePath of deletedFiles) {
         const targetPath = path.join(targetDir, relativePath);
-        const originalTitle = extractTitleFromFile(targetPath);
-
-        // 检查是否已经是占位页面（避免重复处理）
-        const content = fs.existsSync(targetPath) ? fs.readFileSync(targetPath, 'utf-8') : '';
-        if (!content.includes('该文档已被删除或移动')) {
-            generateDeletedPlaceholder(targetPath, originalTitle);
+        if (fs.existsSync(targetPath)) {
+            fs.unlinkSync(targetPath);
+            console.log(`  已删除: ${relativePath}`);
         }
     }
 
+    // 清理空目录
+    cleanEmptyDirectories(targetDir);
+
     // 复制源文件到目标目录
     copyDirectory(project.sourceDir, targetDir, excludeList);
+}
+
+/**
+ * 递归清理空目录
+ * @param {string} dir - 目录路径
+ */
+function cleanEmptyDirectories(dir) {
+    if (!fs.existsSync(dir)) {
+        return;
+    }
+
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+        if (entry.isDirectory()) {
+            const fullPath = path.join(dir, entry.name);
+            cleanEmptyDirectories(fullPath);
+
+            // 再次检查目录是否为空
+            if (fs.existsSync(fullPath) && fs.readdirSync(fullPath).length === 0) {
+                fs.rmdirSync(fullPath);
+            }
+        }
+    }
 }
 
 /**
@@ -231,6 +197,5 @@ module.exports = {
     cleanTargetDirectory,
     generateEmptyProjectPage,
     copyDirectory,
-    collectMdFiles,
-    generateDeletedPlaceholder
+    collectMdFiles
 };
